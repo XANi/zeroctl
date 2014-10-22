@@ -3,6 +3,8 @@ package main
 import (
 	//	"fmt"
 	"github.com/op/go-logging"
+	"gopkg.in/yaml.v1"
+	"io/ioutil"
 	"os"
 )
 
@@ -14,12 +16,18 @@ var syslog_log_format = "[%{level:.1s}] {shortpkg}[%{longfunc}] %{message}"
 
 func main() {
 	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
-	syslogBackend, err := logging.NewSyslogBackend("zeroctl")
-	if err != nil {
-		log.Fatal(err)
-	}
-	logging.SetBackend(logBackend, syslogBackend)
+	//syslogBackend, err := logging.NewSyslogBackend("zeroctl")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	logging.SetBackend(logBackend) //, syslogBackend)
 	logging.SetFormatter(logging.MustStringFormatter(stdout_log_format))
-	log.Error("Logging")
-	log.Warning("Works")
+	var cfg map[string]interface{}
+	raw_cfg, err := ioutil.ReadFile("cfg/zeroctl.conf")
+	err = yaml.Unmarshal([]byte(raw_cfg), &cfg)
+	d, err := yaml.Marshal(&cfg)
+	log.Info("Config:")
+	log.Info(string(d))
+	_ = err // please golang just fuck off from that variable for testing
+
 }

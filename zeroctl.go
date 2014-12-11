@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"protocol"
 	"strings"
 	"time"
 )
@@ -37,6 +38,13 @@ func main() {
 		log.Info(line)
 	}
 	go broadcast("224.1.2.3:54321")
+	a := protocol.NewContainer()
+	a.Body = []byte("asd")
+	//	b := []int{1, 2, 3, 4}
+	//	a.body = byte("test")
+	fmt.Printf("%v\n", a)
+	txt, _ := yaml.Marshal(&a)
+	log.Info(string(txt))
 	time.Sleep(10000 * time.Millisecond)
 }
 
@@ -46,8 +54,14 @@ func broadcast(addr string) {
 		log.Info("network error")
 	}
 	for {
-		log.Info("broadcasting")
-		fmt.Fprintf(conn, "im alive")
+		packet := protocol.NewContainer()
+		hb := protocol.NewHeartbeat()
+		packet.Body, _ = yaml.Marshal(hb.Headers)
+		fmt.Printf("%v\n", packet)
+		fmt.Printf("%v\n", hb)
+		log.Info("Sent hb")
+
+		fmt.Fprintf(conn, string(packet.Body))
 		time.Sleep(1000 * time.Millisecond)
 	}
 }

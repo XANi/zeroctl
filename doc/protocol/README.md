@@ -23,7 +23,7 @@ It can be also used to separate resources of different projects and then futher 
 
 SP **must** generate name of the task when accepting, it **must** be unique
 
-tash **should** be named based on client node name and uniquely generated ID, for example
+task **should** be named based on client node name and uniquely generated ID, for example
 
 `web1_example_com-parser.1382439c-d46b-425f-88a1-98e66d462da1`
 
@@ -47,12 +47,19 @@ Nodes not registered via discovery service, they can generate/consume events and
 
 # Protocol
 
-Each message consist of:
+Message is divided in 3 parts:
+
+* Routing key - used in low-level routing and rough qualification of message type
+* Header - passing basic parameters, and in advanced filtering
+* Body - container for service requests/responses
 
 ## Routing key
 
 String of 255 ascii chars used to address components of the system. It is formatted by parts separated by dots.
 First part is a type of [endpoint](endpoints.md)
+Second part **should** be a name of underlying service and each subsequent part **should** further subdivide service.
+
+So for example if we need to address 6 clusters of service distibuted into 2 DCs, routing key should look like `service.batch-jobs.dc1.cluster3`
 
 ### Filtering
 
@@ -72,7 +79,6 @@ Routing engine **must** be able to route using prefixes (so `prefix.#` filter eq
 ## Header
 
 A set of key=>value pairs with key being 250 ascii string and value limited by header size.
-
 
 Minimum header size is 64KiB of json-encoded data (even if underlying transport have to use less/more data to accomplish it).
 

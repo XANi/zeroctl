@@ -4,3 +4,6 @@ all: dep
 
 dep:
 	gom install
+
+test:
+	gom exec go test

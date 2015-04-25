@@ -90,8 +90,8 @@ Transport **can** add keys on receive but they **must** be contained under `_tra
 
 ### required keys
 
-* `node-uname`
-* `node-uuid`
+* `node-name` - 1-256 byte UTF-8 node name. Human readable, preferably in fqdn-appname form
+* `node-uuid` - 32 byte node UUID
 * `ts` - unixtime, can be s/ms/us accuracy
 * `sha256` - checksum of data part
 

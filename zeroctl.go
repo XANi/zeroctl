@@ -2,6 +2,7 @@ package main
 
 import (
 	//	"fmt"
+	"crypto/rand"
 	"fmt"
 	"github.com/op/go-logging"
 	"gopkg.in/yaml.v1"
@@ -53,15 +54,19 @@ func broadcast(addr string) {
 	if err != nil {
 		log.Info("network error")
 	}
+	uuid := make([]byte, 32)
+	hostname, _ := os.Hostname()
+	rand.Read(uuid)
+	node := protocol.NewNode(hostname, uuid)
 	for {
 		packet := protocol.NewContainer()
-		hb := protocol.NewHeartbeat()
+		hb := node.NewHeartbeat()
 		packet.Body, _ = yaml.Marshal(hb.Headers)
-		fmt.Printf("%v\n", packet)
-		fmt.Printf("%v\n", hb)
-		log.Info("Sent hb")
+		log.Debug("Sent hb")
 
 		fmt.Fprintf(conn, string(packet.Body))
 		time.Sleep(1000 * time.Millisecond)
 	}
 }
+
+//func

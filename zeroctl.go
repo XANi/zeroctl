@@ -12,6 +12,7 @@ import (
 	"protocol"
 	"strings"
 	"time"
+	amqp09 "transport/amqp09"
 )
 
 var log = logging.MustGetLogger("example")
@@ -58,10 +59,12 @@ func broadcast(addr string) {
 	hostname, _ := os.Hostname()
 	rand.Read(uuid)
 	node := protocol.NewNode(hostname, uuid)
+	transport := amqp09.NewTransport()
 	for {
 		packet := protocol.NewContainer()
 		hb := node.NewHeartbeat()
 		packet.Body, _ = yaml.Marshal(hb.Headers)
+		transport.SendEvent(hb, "discovery.service", "cake")
 		log.Debug("Sent hb")
 
 		fmt.Fprintf(conn, string(packet.Body))

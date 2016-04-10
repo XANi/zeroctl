@@ -40,12 +40,32 @@ func main() {
 	}
 	hostname, _ := os.Hostname()
 	node := zerosvc.NewNode(hostname)
-	go broadcast(node)
-	time.Sleep(10000 * time.Millisecond)
+	amqpAddr := "amqp://guest:guest@localhost:5672"
+	if os.Getenv(`ZEROCTL_ADDR`) != `` {
+		amqpAddr = os.Getenv(`ZEROCTL_ADDR`)
+	}
+	var trCfg interface{}
+	transport := zerosvc.NewTransport(zerosvc.TransportAMQP, amqpAddr, trCfg)
+	conn_err := transport.Connect()
+	if conn_err != nil {
+		log.Error("Can't connect to default transport on [%s]: %+v", amqpAddr, conn_err)
+		os.Exit(1)
+	}
+	go broadcast(node, transport)
+	for {
+		time.Sleep(10000 * time.Millisecond)
+	}
 }
 
-func broadcast(node zerosvc.Node) {
+func broadcast(node zerosvc.Node, transport zerosvc.Transport) {
 	_ = node
+	for {
+		log.Debug("Sending heartbeat")
+		hb := node.NewHeartbeat()
+		hb.Prepare()
+		transport.SendEvent(`/discovery.node`, hb)
+		time.Sleep(time.Second * 3)
+	}
 }
 
 //func

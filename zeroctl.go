@@ -2,17 +2,16 @@ package main
 
 import (
 	//	"fmt"
-	"crypto/rand"
-	"fmt"
+	//	"crypto/rand"
+	//	"fmt"
 	"github.com/op/go-logging"
+	"github.com/zerosvc/go-zerosvc"
 	"gopkg.in/yaml.v1"
 	"io/ioutil"
-	"net"
+	//	"net"
 	"os"
-	"protocol"
 	"strings"
 	"time"
-	amqp09 "transport/amqp09"
 )
 
 var log = logging.MustGetLogger("example")
@@ -39,37 +38,14 @@ func main() {
 	for _, line := range strings.Split(string(d), "\n") {
 		log.Info(line)
 	}
-	go broadcast("224.1.2.3:54321")
-	a := protocol.NewContainer()
-	a.Body = []byte("asd")
-	//	b := []int{1, 2, 3, 4}
-	//	a.body = byte("test")
-	fmt.Printf("%v\n", a)
-	txt, _ := yaml.Marshal(&a)
-	log.Info(string(txt))
+	hostname, _ := os.Hostname()
+	node := zerosvc.NewNode(hostname)
+	go broadcast(node)
 	time.Sleep(10000 * time.Millisecond)
 }
 
-func broadcast(addr string) {
-	conn, err := net.Dial("udp", addr)
-	if err != nil {
-		log.Info("network error")
-	}
-	uuid := make([]byte, 32)
-	hostname, _ := os.Hostname()
-	rand.Read(uuid)
-	node := protocol.NewNode(hostname, uuid)
-	transport := amqp09.NewTransport()
-	for {
-		packet := protocol.NewContainer()
-		hb := node.NewHeartbeat()
-		packet.Body, _ = yaml.Marshal(hb.Headers)
-		transport.SendEvent(hb, "discovery.service", "cake")
-		log.Debug("Sent hb")
-
-		fmt.Fprintf(conn, string(packet.Body))
-		time.Sleep(1000 * time.Millisecond)
-	}
+func broadcast(node zerosvc.Node) {
+	_ = node
 }
 
 //func

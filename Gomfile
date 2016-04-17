@@ -1,5 +1,3 @@
 gom 'github.com/op/go-logging'
-gom 'github.com/go-stomp/stomp'
-gom 'github.com/pebbe/zmq4'
 gom 'gopkg.in/yaml.v1'
 gom 'github.com/zerosvc/go-zerosvc'

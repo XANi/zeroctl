@@ -82,6 +82,9 @@ fi
 # cleanup resulting file, else any coverage tool fails with can't find "cmd.go": cannot find package "_/repo/path"
 sed -i -e "s#.*/\(.*\.go\)#\./\\1#" cover.out
 
+echo "=== running build"
+make
+
 echo "Generating cover-cobertura.xml"
 gocov convert cover.out  >cover.json
 cat cover.json |gocov-xml >cover-cobertura.xml

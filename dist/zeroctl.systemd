@@ -1,0 +1,16 @@
+[Unit]
+Description=Zeroctl service
+
+[Service]
+Restart=always
+ExecStart=/usr/local/bin/zeroctl
+Environment="ZEROCTL_ADDR=amqp://monitor:monitor@localhost:5672"
+KillMode=control-group
+TimeoutStopSec=30
+Restart=always
+RestartSec=30s
+WorkingDirectory=/var/lib/zeroctl
+User=root
+
+[Install]
+WantedBy=multi-user.target
